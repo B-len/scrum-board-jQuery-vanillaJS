@@ -1,13 +1,23 @@
-let express = require('express')
+let express = require('express');
 let app = express();
-var cors = require('cors')
+var cors = require('cors');
 let getAllBoard = require('./getAllBoard.js');
-
+let saveNewTask = require('./saveNewTask.js');
+let bodyParser = require('body-parser')
 // allow cross origin domain
-app.use(cors())
+app.use(cors());
+
+// body parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 
 // setup endpoint for getting all the lists from the board 
 app.get('/api/lists', getAllBoard);
+
+// Endpoint for saving new tasks
+app.post('/api/list/:listID/:taskID', saveNewTask)
 
 // start server listening at port 3000
 app.listen(3000, '127.0.0.1', () => {

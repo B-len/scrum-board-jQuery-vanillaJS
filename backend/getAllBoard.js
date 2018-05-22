@@ -1,6 +1,8 @@
 let fs = require('fs');
-let onFileRead =  (error, file) => {
-        if(error) {
+
+let getBoard = (req, res) => {
+    let onFileRead = (error, file) => {
+        if (error) {
             res.status(500).send('problem reading  the file');
             return;
         } else {
@@ -12,7 +14,6 @@ let onFileRead =  (error, file) => {
             }
         }
     }
-let getBoard = (req, res) => {
     // read board.json from fs and parse it to JS object and send it back as JSON
     fs.readFile('backend/board.json', 'utf-8', onFileRead)
 }
