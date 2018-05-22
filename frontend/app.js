@@ -76,6 +76,17 @@ let removeList = function (event) {
 };
 
 let callbackOnReady = () => {
+    var config = {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    };
+    axios.get('http://127.0.0.1:3000/api/lists', config)
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(console.error)
+
     $('.addList button').on('click', addList);
     $('.lists').on('click', '.listHeader button', removeList);
     $('.lists').on('click', '.addTask button', addTask);
