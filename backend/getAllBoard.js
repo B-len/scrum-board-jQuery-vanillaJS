@@ -1,7 +1,5 @@
 let fs = require('fs');
-let getBoard = (req, res) => {
-    // read board.json from fs and parse it to JS object and send it back as JSON
-    fs.readFile('backend/board.json', 'utf-8', (error, file) => {
+let onFileRead =  (error, file) => {
         if(error) {
             res.status(500).send('problem reading  the file');
             return;
@@ -13,6 +11,9 @@ let getBoard = (req, res) => {
                 res.status(500).send('problem parsing the file ');
             }
         }
-    })
+    }
+let getBoard = (req, res) => {
+    // read board.json from fs and parse it to JS object and send it back as JSON
+    fs.readFile('backend/board.json', 'utf-8', onFileRead)
 }
 module.exports = getBoard;

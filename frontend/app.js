@@ -76,32 +76,33 @@ let removeList = function (event) {
     node.remove();
 
 };
-let paintListsOnStart = (response) => {
+let paintTasks = (listNode, tasks) => {
+    for (const task of tasks) {
+        // crear un node html
+        let newTaskNode = $(createTaskItemTemplate(task.text));
 
-    let lists = response.data.lists;
-    for (const list of lists) {
-        paintIndividualList(list);
+        // inyectar el node creado
+        listNode.append(newTaskNode);
     }
 }
-
-let paintIndividualList = (list) => {
-    // pinta la list
-    console.log(list);
-    let listNode = addList({}, list.name);
-    for (const task of list.tasks) {
-        addTask({}, listNode, task);
+let paintListsOnStart = (response) => {
+    let lists = response.data.lists;
+    for (const list of lists) {
+        let listNode = addList({}, list.name);
+        paintTasks(listNode, list.tasks);
     }
-
 }
 
 let callbackOnReady = () => {
-    var promesa = axios.get('http://127.0.0.1:3000/api/lists', {
+    let config = {
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
-    })
+    };
+    
+    axios.get('http://127.0.0.1:3000/api/lists', config).then(paintListsOnStart).catch(console.error)
 
-    promesa.then(paintListsOnStart).catch(console.error)
+
 
     $('.addList button').on('click', addList);
     $('.lists').on('click', '.listHeader button', removeList);
