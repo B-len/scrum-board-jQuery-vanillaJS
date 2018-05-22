@@ -40,13 +40,13 @@ let addTask = function (evento) {
         "color": "tomato"
 
     }
-    
+
     let listId = listNode[0].dataset.listid
-    // save task to the backend
+    // save task to the backend before injecting a new node
     saveTask(newTask, listId)
         .then((response) => {
-            console.log(response);
-            
+            // if the backend succeeds 
+
             // crear un node html
             let newTaskNode = $(createTaskItemTemplate(taskText, newTask.taskId));
 
@@ -56,6 +56,7 @@ let addTask = function (evento) {
             input.value = ''; // vanilla Js
         })
         .catch((e) => {
+            // if the backend failed
             console.error('no se pudo guardar la tarea, inténtelo de nuevo:', e)
         })
 
@@ -112,10 +113,8 @@ let paintListsOnStart = (response) => {
     }
 }
 let saveTask = function (task, listId) {
-    
-
-   return axios.post(`http://127.0.0.1:3000/api/list/${listId}/${task.taskId}`, task)
-
+    // post new task the backend
+    return axios.post(`http://127.0.0.1:3000/api/list/${listId}/${task.taskId}`, task)
 }
 
 let callbackOnReady = () => {
@@ -124,7 +123,7 @@ let callbackOnReady = () => {
             'Access-Control-Allow-Origin': '*'
         }
     };
-
+    // fetch saved lists from the backend
     axios.get('http://127.0.0.1:3000/api/lists', config).then(paintListsOnStart).catch(console.error)
 
 
