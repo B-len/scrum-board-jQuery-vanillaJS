@@ -23,12 +23,11 @@ let createTaskItemTemplate = (text) =>
 </div>
 `
 let addTask = function () {
-    // acceder a la node llamado
-    let node = $(this).parent();
+    let node = $(this).parent()
+    let listNode = node.parent()
     let input = node[0].children[0]; // vanilla Js
-
-    // recoger el valor de input
     let taskText = input.value.trim(); // vanilla Js
+
     // si no hay nombre no hagas nada
     if (taskText === '') {
         console.error('no valid task name');
@@ -39,7 +38,7 @@ let addTask = function () {
     let newTaskNode = $(createTaskItemTemplate(taskText));
 
     // inyectar el node creado
-    node.parent().append(newTaskNode);
+    listNode.append(newTaskNode);
     // borrar el value;
     input.value = ''; // vanilla Js
 
@@ -50,10 +49,12 @@ let removeTask = function () {
     node.remove();
 
 };
-let addList = () => {
-    // recoger el nombre de la lista
-    let listName = $('.addList input').val().trim();
+let addList = (evento, listName) => {
+    if (!listName) {
+        // recoger el nombre de la lista
+        listName = $('.addList input').val().trim();
 
+    }
     // si no hay nombre no hagas nada
     if (listName === '') {
         console.error('no valid list name')
@@ -66,6 +67,7 @@ let addList = () => {
 
     // inyectarlo
     $('.lists').append(newList);
+    return newList;
 
 };
 let removeList = function (event) {
@@ -74,18 +76,32 @@ let removeList = function (event) {
     node.remove();
 
 };
+let paintListsOnStart = (response) => {
+
+    let lists = response.data.lists;
+    for (const list of lists) {
+        paintIndividualList(list);
+    }
+}
+
+let paintIndividualList = (list) => {
+    // pinta la list
+    console.log(list);
+    let listNode = addList({}, list.name);
+    for (const task of list.tasks) {
+        addTask({}, listNode, task);
+    }
+
+}
 
 let callbackOnReady = () => {
-    var config = {
+    var promesa = axios.get('http://127.0.0.1:3000/api/lists', {
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
-    };
-    axios.get('http://127.0.0.1:3000/api/lists', config)
-        .then(function (response) {
-            console.log(response.data);
-        })
-        .catch(console.error)
+    })
+
+    promesa.then(paintListsOnStart).catch(console.error)
 
     $('.addList button').on('click', addList);
     $('.lists').on('click', '.listHeader button', removeList);
