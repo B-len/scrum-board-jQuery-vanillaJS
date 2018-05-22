@@ -55,8 +55,8 @@ let addTask = function (evento) {
             // borrar el value;
             input.value = ''; // vanilla Js
         })
-        .catch(() => {
-            alert('no se pudo guardar la tarea, inténtelo de nuevo')
+        .catch((e) => {
+            console.error('no se pudo guardar la tarea, inténtelo de nuevo:', e)
         })
 
 
