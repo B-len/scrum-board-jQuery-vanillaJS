@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "live-server"
+    "start:frontend": "live-server frontend/"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jQuery": "^1.7.4",
+    "jQuery": "^1.7.4"
+  },
+  "devDependencies": {
     "live-server": "^1.2.0"
   }
 }
