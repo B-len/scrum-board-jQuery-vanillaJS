@@ -1,4 +1,8 @@
+
+const SERVER_URI = 'http://127.0.0.1:3000';
+
 let createId = (namespace) => `${namespace}-${Date.now()}-${Math.round(Math.random() * 100)}`
+
 let createListTemplate = (text, id) =>
     `
 <div class="list" data-listId="${id}">
@@ -33,17 +37,18 @@ let addTask = function (evento) {
         console.error('no valid task name');
         return;
     }
+    let listId = listNode[0].dataset.listid;
+
     let newTask = {
         "taskId": createId('task'),
         "text": taskText,
         "completed": false,
-        "color": "tomato"
-
+        "color": "tomato",
+        "listId": listId
     }
 
-    let listId = listNode[0].dataset.listid
-    // save task to the backend before injecting a new node
-    saveTask(newTask, listId)
+    // REQUEST to save task to the backend before injecting a new node
+    axios.post(`${SERVER_URI}/api/lists/${listId}`, newTask)
         .then((response) => {
             // if the backend succeeds 
 
@@ -69,25 +74,41 @@ let removeTask = function () {
     node.remove();
 
 };
-let addList = (evento, listName, listID) => {
-    if (!listName) {
-        // recoger el nombre de la lista
-        listName = $('.addList input').val().trim();
+let paintList = (list) => {
+     // borrar el input
+     $('.addList input').val('')
+     // crear el nodo
+     let newList = $(createListTemplate(list.name, list.listId));
 
-    }
+     // inyectarlo
+     $('.lists').append(newList);
+     return newList;
+} 
+let addList = (evento) => {
+        // recoger el nombre de la lista
+    let listName = $('.addList input').val().trim();
     // si no hay nombre no hagas nada
     if (listName === '') {
         console.error('no valid list name')
         return;
     }
-    // borrar el input
-    $('.addList input').val('')
-    // crear el nodo
-    let newList = $(createListTemplate(listName, listID));
-
-    // inyectarlo
-    $('.lists').append(newList);
-    return newList;
+    let newList = {
+        "listId": createId('list'),
+        "name": listName,
+        "tasks": []
+    }
+    // REQUEST to save list to backend
+    axios.post(`${SERVER_URI}/api/lists`, newList)
+        .then((response) => {
+            // if the backend succeeds
+            console.log('list saved, response:', response);
+            
+            paintList(newList);
+        }).catch((error) => {
+            // if the backend fails
+            console.error('list can\'t be saved, error:', error)
+        });
+   
 
 };
 let removeList = function (event) {
@@ -108,14 +129,11 @@ let paintTasks = (listNode, tasks) => {
 let paintListsOnStart = (response) => {
     let lists = response.data.lists;
     for (const list of lists) {
-        let listNode = addList({}, list.name, list.listId);
+        let listNode = paintList(list);
         paintTasks(listNode, list.tasks);
     }
 }
-let saveTask = function (task, listId) {
-    // post new task the backend
-    return axios.post(`http://127.0.0.1:3000/api/list/${listId}/${task.taskId}`, task)
-}
+
 
 let callbackOnReady = () => {
     let config = {
@@ -123,8 +141,8 @@ let callbackOnReady = () => {
             'Access-Control-Allow-Origin': '*'
         }
     };
-    // fetch saved lists from the backend
-    axios.get('http://127.0.0.1:3000/api/lists', config).then(paintListsOnStart).catch(console.error)
+    // REQUEST to fetch saved lists from the backend
+    axios.get(`${SERVER_URI}/api/lists`, config).then(paintListsOnStart).catch(console.error)
 
 
 
