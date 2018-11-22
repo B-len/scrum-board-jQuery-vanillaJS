@@ -22,10 +22,15 @@ let createTaskItemTemplate = ( text ) =>
     </div>
 </div>
 `
-let addTask = function () {
+let createElement = htmlString => {
+    let node = document.createElement( 'div' );
+    node.innerHTML = htmlString;
+    return node.firstElementChild;
+}
+let addTask = function ( event ) {
     // acceder a la node llamado
-    let node = $( this ).parent();
-    let input = node[ 0 ].children[ 0 ]; // vanilla Js
+    let node = event.target;
+    let input = node.parentNode.querySelector( 'input' );
 
     // recoger el valor de input
     let taskText = input.value.trim(); // vanilla Js
@@ -36,10 +41,10 @@ let addTask = function () {
     }
 
     // crear un node html
-    let newTaskNode = $( createTaskItemTemplate( taskText ) );
+    let newTaskNode = createElement( createTaskItemTemplate( taskText ) );
 
     // inyectar el node creado
-    node.parent().append( newTaskNode );
+    node.parentNode.parentNode.append( newTaskNode );
     // borrar el value;
     input.value = ''; // vanilla Js
 
